@@ -25,6 +25,10 @@ It continuously checks an application's health endpoint, identifies service disr
 - Flask
 - Requests
 - Pytest
+- Prometheus
+- Grafana
+- Docker
+- Docker Compose
 - Git
 
 ## Project Structure
@@ -35,10 +39,12 @@ application-reliability-monitor/
 - monitoring/
   - health_check.py
   - test_health_check.py
-- logs/
-  - health_check.log
-  - incidents.json
+- prometheus/
+  - prometheus.yml
 - docs/
+  - incident-response.md
+- logs/ (generated at runtime)
+- docker-compose.yml
 - requirements.txt
 - .gitignore
 - README.md
@@ -52,10 +58,32 @@ application-reliability-monitor/
 5. When the application recovers, downtime is calculated.
 6. Incident information is saved for future analysis.
 
+
 ## Installation
 
 Clone the repository:
 
 ```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
+git clone https://github.com/gabriellacoop/application-reliability-monitor.git
 cd application-reliability-monitor
+```
+
+## Running Tests
+
+The project includes automated tests using pytest and Flask's test client.
+
+To run the test suite:
+
+```bash
+python -m pytest -v
+```
+
+The tests validate:
+
+- Health check endpoint (`/health`)
+- JSON response format
+- Main application endpoint (`/`)
+- Prometheus metrics endpoint (`/metrics`)
+
+Tests run independently without requiring the Flask server to be running.
+```

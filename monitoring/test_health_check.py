@@ -1,34 +1,40 @@
-import requests
+
+import pytest
+from app.main import app
 
 
-def test_health_check_healthy():
-    response = requests.get(
-        "http://127.0.0.1:5001/health",
-        timeout=5
-    )
+@pytest.fixture
+def client():
+    app.config["TESTING"] = True
+
+    with app.test_client() as test_client:
+        yield test_client
+
+
+def test_health_check_healthy(client):
+    response = client.get("/health")
 
     assert response.status_code == 200
-    assert response.json()["status"] == "healthy"
-def test_health_check_server_error():
-    from unittest.mock import patch, Mock
+    assert response.json["status"] == "healthy"
 
-    mock_response = Mock()
-    mock_response.status_code = 500
 
-    with patch("requests.get", return_value=mock_response):
-        response = requests.get("http://127.0.0.1:5001/health")
+def test_health_check_returns_json(client):
+    response = client.get("/health")
 
-        assert response.status_code == 500
-def test_health_check_connection_error():
-    from unittest.mock import patch
-    import requests
+    assert response.is_json
+    assert "timestamp" in response.json
 
-    with patch(
-        "requests.get",
-        side_effect=requests.exceptions.ConnectionError
-    ):
-        try:
-            requests.get("http://127.0.0.1:5001/health")
-            assert False, "Expected ConnectionError"
-        except requests.exceptions.ConnectionError:
-            assert True
+
+def test_home_endpoint(client):
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert response.json["message"] == (
+        "Application Reliability Monitor is running!"
+    )
+def test_metrics_endpoint(client):
+    response = client.get("/metrics")
+
+    assert response.status_code == 200
+    assert b"app_health_checks_total" in response.data
+    assert b"app_health_status" in response.data

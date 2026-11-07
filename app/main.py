@@ -44,3 +44,10 @@ def metrics():
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5001, debug=False)
+
+def test_metrics_endpoint(client):
+    response = client.get("/metrics")
+
+    assert response.status_code == 200
+    assert b"app_health_checks_total" in response.data
+    assert b"app_health_status" in response.data
