@@ -129,6 +129,8 @@ The monitoring script checks application availability every 5 seconds and record
 
 ## Prometheus and Grafana
 
+![Application Reliability Monitoring Dashboard](docs/grafana-dashboard.png)
+
 Start the monitoring infrastructure using Docker Compose:
 
 ```bash
